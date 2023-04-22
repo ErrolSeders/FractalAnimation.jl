@@ -243,7 +243,7 @@ end
 """
 continuous_juliasets(set_p::SetParams, func::Function, γ::Vector, cscheme, maxiter::Int) = @cont begin
     for c ∈ γ
-        @pipe juliaset(set_p, func, γ, maxiter) |> apply_colorscheme(cscheme, _, maxiter) |> cont
+        @pipe juliaset(set_p, func, c, maxiter) |> apply_colorscheme(cscheme, _, maxiter) |> cont
     end
 end    
 
