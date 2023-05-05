@@ -1,7 +1,7 @@
 name = "FractalAnimation"
 uuid = "6118da02-c7f1-44e0-8933-0c8b5cc44c9b"
-authors = ["ErrolSeders <errolbucy@gmail.com>"]
-version = "1.0.0-DEV"
+authors = ["ErrolSeders <errolseders@gmail.com>"]
+version = "0.1.0"
 
 [deps]
 CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
