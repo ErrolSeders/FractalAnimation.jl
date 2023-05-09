@@ -1,6 +1,5 @@
 module FractalAnimation
 
-
 using ProgressMeter: @showprogress
 using ColorSchemes
 using Continuables
