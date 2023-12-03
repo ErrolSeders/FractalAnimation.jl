@@ -15,11 +15,11 @@ export SetParams, juliaset, juliaprogression, animateprogression
 export show_mandelbrot_traversal, mandelbrotset, to_gpu, batched_animate, continuous_animate
 
 """
-    escapeeval(f, threshold[, c, z, maxiter])
+escapeeval(f, threshold[, c, z, maxiter])
 
-    Evaluate the divergence speed for a given function of z,c in the complex plane. 
-    For julia and fatou sets pass the whole complex plane as z
-    For mandelbrot-esque sets pass the whole complex plane as c
+Evaluate the divergence speed for a given function of z,c in the complex plane. 
+For julia and fatou sets pass the whole complex plane as z
+For mandelbrot-esque sets pass the whole complex plane as c
 """
 function escapeeval(f::Function, 
                     threshold::Real, 
@@ -59,9 +59,9 @@ function _genplane(min_coord::Complex, max_coord::Complex, width::Integer, heigh
 end
 
 """
-    SetParams(min_coord, max_coord, resolution, threshold, nr_frames[, gpu])
+    SetParams(min_coord, max_coord, resolution, threshold, nr_frames [, gpu])
 
-    #Feilds
+#Fields
     - `min_coord::ComplexF64`: The coordinate of the bottom-left of the image frame.
     - `max_coord::ComplexF64`: The coordinate of the top-right of the image frame. 
     - `resolution::Int64`: The number of pixels in a 1x1 square in the complex plane
@@ -82,9 +82,6 @@ struct SetParams
     threshold::Float64 
     nr_frames::Int64
     gpu::Bool
-    """ 
-        The resolution, minimum, & maximum coordiantes determine the width & height
-    """
     function SetParams(min_coord::Complex, max_coord::Complex, resolution::Integer, threshold::Real, nr_frames::Integer, gpu::Bool = false) 
         if min_coord.re ≥ max_coord.re; error("Max real component cannot be less than or equal to Min real component!") end
         if min_coord.im ≥ max_coord.im; error("Max imaginary component cannot be less than or equal to Min imaginary component!") end
@@ -108,9 +105,9 @@ end
 """
     to_gpu(p)
 
-    Return a new SetParams sruct allocated on the GPU
-    This is a convenience method only! 
-    For initial construction pass `true` to the `gpu` feild of `SetParams`.
+Return a new SetParams sruct allocated on the GPU
+This is a convenience method only! 
+For initial construction pass `true` to the `gpu` feild of `SetParams`.
 """
 function to_gpu(p::SetParams)
     if p.gpu == true
@@ -122,9 +119,9 @@ function to_gpu(p::SetParams)
 end
 
 """
-    mandelbrotset(set_p, f[ z, maxiter])
+    mandelbrotset(set_p, f[, z, maxiter])
 
-    Return an array of the Mandelbrot-esque set for function `f` given initial value `z` 
+Return an array of the Mandelbrot-esque set for function `f` given initial value `z` 
 """
 mandelbrotset(set_p::SetParams, f::Function, z::Complex = 0.0+0.0im, maxiter::Integer = 255) = 
     set_p.gpu == true ? exec_gpu_kernel_mandelbrot(set_p, f, z, maxiter) |> Array : escapeeval.(f, set_p.threshold, set_p.plane, z, maxiter)
@@ -132,7 +129,7 @@ mandelbrotset(set_p::SetParams, f::Function, z::Complex = 0.0+0.0im, maxiter::In
 """
     juliaset(set_p, f, c[, maxiter])
     
-    Return an array of the Julia set for function `f` around point `c` 
+Return an array of the Julia set for function `f` around point `c` 
 """
 juliaset(set_p::SetParams, f::Function, c::Complex, maxiter::Integer = 255) = 
     set_p.gpu == true ? exec_gpu_kernel_julia(set_p, f, c, maxiter) |> Array : escapeeval.(f, set_p.threshold, c, set_p.plane, maxiter)
@@ -143,23 +140,22 @@ juliaset(set_p::SetParams, f::Function, c::Complex, maxiter::Integer = 255) =
 """
     juliaprogression(set_p, points, f[, maxiter])
 
-    Return a Vector of julia sets for vector of `points` for function `f`
+Return a Vector of julia sets for vector of `points` for function `f`
 """
 juliaprogression(set_p::SetParams, points::Vector, f::Function, maxiter::Integer = 255) = [(c,juliaset(set_p, f, c, maxiter)) for c ∈ points]
 
 """
     show_mandelbrot_traversal(set_p, γ, f[; <keyword arguments>])
 
-    Overlay and display the set of points `γ` over the Mandelbrot set for function `f`
+Overlay and display the set of points `γ` over the Mandelbrot set for function `f`
 
-    # Arguments 
+# Arguments 
     - `set_p::SetParams`
     - `γ::Vector`
     - `f::Function`
     - `heat_c::Symbol=:terrain`: Color scheme for the heatmap of the Mandelbrot-esque set
     - `line_c::Symbol=:red`: Color of the line for vector `γ`
 """
-
 function show_mandelbrot_traversal(set_p::SetParams, γ::Vector, f::Function; heat_c=:terrain, line_c=:red)
     plane = set_p.plane |> Array
     mapped_points = map_points_to_plane(γ, plane)
@@ -184,11 +180,10 @@ end
 """
     batched_animate(set_p, γ, func[, filepath, cscheme, batchsize, maxiter])
 
-    Generate a video showing the julia progression along vector `γ` for function `func` with parameters `set_p`
+Generate a video showing the julia progression along vector `γ` for function `func` with parameters `set_p`
     
-    Divides the task of generating and writing the video into batches to avoid overwhelimg memory.
+Divides the task of generating and writing the video into batches to avoid overwhelimg memory.
 """
-
 function batched_animate(set_p::SetParams, γ::Vector, func::Function, 
                          filepath::String = "progression.mp4", cscheme = ColorSchemes.terrain, 
                          batchsize::Integer = 30, maxiter::Integer = 255)
@@ -216,11 +211,10 @@ end
 """
     continuous_animate(set_p, γ, func[, filepath, cscheme, maxiter])
 
-    Generate a video showing the julia progression along vector `γ` for function `func` with parameters `set_p`
+Generate a video showing the julia progression along vector `γ` for function `func` with parameters `set_p`
 
-    Uses Continous.jl to gererate sets as needed then write them to the video file.
+Uses Continous.jl to gererate sets as needed then write them to the video file.
 """
-
 function continuous_animate(set_p::SetParams, γ::Vector, func::Function,
                             filepath::String = "progression.mp4", cscheme = ColorSchemes.terrain,
                             maxiter::Integer = 255)
@@ -352,6 +346,5 @@ function exec_gpu_kernel_mandelbrot(set_p::SetParams, f::Function, z_init::Compl
     
     return out
 end
-
 
 end
